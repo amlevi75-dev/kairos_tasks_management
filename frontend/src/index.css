@@ -1,0 +1,320 @@
+/* DM Sans, bundled locally (variable weight 100–1000, SIL OFL 1.1 — see
+   assets/fonts/OFL.txt). No runtime request leaves the network. Vite
+   fingerprints and copies the woff2 files into the build. DM Sans has no
+   Hebrew glyphs; Hebrew text falls through to the system fonts in the
+   body font stack. */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 1000;
+  src: url('./assets/fonts/dm-sans-latin-ext-wght-normal.woff2') format('woff2-variations'),
+       url('./assets/fonts/dm-sans-latin-ext-wght-normal.woff2') format('woff2');
+  unicode-range: U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF;
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 1000;
+  src: url('./assets/fonts/dm-sans-latin-wght-normal.woff2') format('woff2-variations'),
+       url('./assets/fonts/dm-sans-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+/* ── Dark theme (default) ── */
+:root {
+  --bg-base:      #0b0f1a;
+  --bg-surface:   #111827;
+  --bg-elevated:  #1a2236;
+  --bg-hover:     #1e2d45;
+  --border:       #1e293b;
+  --border-soft:  #263348;
+
+  --text-primary:   #e2e8f0;
+  --text-secondary: #94a3b8;
+  /* was #475569 — 2.5:1 against bg-base, fails WCAG AA (4.5:1).
+     #8896ab measures 6.4:1 while staying visibly dimmer than
+     text-secondary, so the three-tier hierarchy is preserved. */
+  --text-muted:     #909eb3;
+
+  --accent:      #0F766E;
+  --accent-soft: #042f2e;
+  --accent-glow: rgba(15,118,110,0.18);
+
+  --green:  #10b981;
+  --yellow: #f59e0b;
+  --red:    #ef4444;
+  --purple: #8b5cf6;
+
+  /* Text-safe accent: teal as text/icons on dark surfaces (≥5:1). The fill
+     accent above stays for buttons with white labels. */
+  --accent-text: #2dd4bf;
+  --danger-fill: #dc2626;   /* white label on it reads 4.8:1 */
+
+  /* Signal palette — status, priority and role. One source of truth for
+     every view (see src/signals.js). Each reads ≥4.5:1 as text on the
+     surface tones and on its own 12% tint. */
+  --sig-slate:  #94a3b8;
+  --sig-blue:   #60a5fa;
+  --sig-amber:  #f59e0b;
+  --sig-green:  #34d399;
+  --sig-red:    #f87171;
+  --sig-violet: #a78bfa;
+
+  --radius:    8px;
+  --radius-lg: 12px;
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Light theme ── */
+[data-theme="light"] {
+  --bg-base:      #f1f5f9;
+  --bg-surface:   #ffffff;
+  --bg-elevated:  #f8fafc;
+  --bg-hover:     #e2e8f0;
+  --border:       #e2e8f0;
+  --border-soft:  #cbd5e1;
+
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  /* was #94a3b8 — 2.1:1 on white. #566476 holds 4.7:1 on every light
+     surface while staying a step below text-secondary. */
+  --text-muted:     #566476;
+
+  /* was #0d9488 — white button labels on it read 3.7:1. */
+  --accent:      #0f766e;
+  --accent-soft: #ccfbf1;
+  --accent-glow: rgba(13,148,136,0.12);
+
+  --green:  #059669;
+  --yellow: #d97706;
+  --red:    #dc2626;
+  --purple: #7c3aed;
+
+  --accent-text: #115e59;
+  --danger-fill: #b91c1c;
+
+  --sig-slate:  #475569;
+  --sig-blue:   #1d4ed8;
+  --sig-amber:  #92400e;
+  --sig-green:  #065f46;
+  --sig-red:    #b91c1c;
+  --sig-violet: #6d28d9;
+
+  --shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Direction is set once on <html> (see main.jsx). Components use logical
+   properties (inline-start/end), so flipping dir="rtl" mirrors the app. */
+
+/* Headings must follow the theme. Without this they fall back to the
+   user-agent default (black), which is invisible in dark mode. Covers every
+   h1-h6 in the app rather than relying on per-element inline colours. */
+h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
+
+body {
+  font-family: 'DM Sans', system-ui, 'Segoe UI', Arial, sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Safety net: color is inherited by default, so this should be redundant —
+   but the project-name bug turned out to be a spot that visually read as
+   using the body's default despite the div itself carrying no explicit
+   color. Forcing it on the generic text-carrying elements removes any
+   ambiguity rather than relying on inheritance holding everywhere. */
+div, span, p, td, th, label, button {
+  color: inherit;
+}
+
+/* Keyboard focus — one consistent ring for every interactive element.
+   Mouse clicks don't trigger it (focus-visible). */
+:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+.input:focus-visible, .select:focus-visible, .richtext-editor:focus-visible { outline: none; }
+
+::selection { background: color-mix(in srgb, var(--accent) 45%, transparent); color: var(--text-primary); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-surface); }
+::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 3px; }
+
+button { cursor: pointer; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: var(--radius);
+  font-size: 14px; font-weight: 500;
+  border: none;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease,
+              box-shadow 0.15s ease, transform 0.15s ease, filter 0.15s ease;
+}
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; filter: none; box-shadow: none; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 4px 12px var(--accent-glow); }
+.btn-ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border-soft); }
+.btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.btn-danger { background: var(--danger-fill); color: #fff; }
+.btn-danger:hover { filter: brightness(1.1); }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+.input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  padding: 9px 12px; font-size: 14px; width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s; outline: none;
+}
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.input::placeholder { color: var(--text-muted); }
+
+/* Native date/time pickers render a dark calendar icon by default — nearly
+   invisible on a dark background. color-scheme tells the browser to draw
+   its built-in controls (including the calendar icon) using light colours;
+   the WebKit filter is a fallback for engines that ignore color-scheme on
+   this specific icon. */
+input[type="date"], input[type="datetime-local"], input[type="time"] {
+  color-scheme: dark;
+}
+[data-theme="light"] input[type="date"],
+[data-theme="light"] input[type="datetime-local"],
+[data-theme="light"] input[type="time"] { color-scheme: light; }
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(1.5);
+  cursor: pointer;
+  border-radius: 3px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) brightness(1.5) drop-shadow(0 0 2px var(--accent));
+}
+
+.select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  padding: 8px 12px; font-size: 13px; outline: none; cursor: pointer;
+}
+.select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.15s ease;
+}
+.modal {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  width: 90%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  animation: slideUp 0.2s ease;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--border);
+}
+.modal-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+@keyframes slideUp { from { opacity:0; transform:translateY(16px) } to { opacity:1; transform:translateY(0) } }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+
+/* Rich text description editor */
+.richtext-editor:empty::before {
+  content: attr(data-placeholder);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.richtext-editor ol { margin: 0; margin-inline-start: 20px; padding: 0; }
+.richtext-editor ul { margin: 0; margin-inline-start: 20px; padding: 0; }
+.richtext-editor:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+/* Light theme: the date-picker icon filter is only needed on dark. */
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-theme="light"] input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+[data-theme="light"] input[type="time"]::-webkit-calendar-picker-indicator { filter: none; }
+
+/* ── Icons ── inline SVG, inherit currentColor (src/components/Icon.jsx) */
+.icon { display: inline-block; flex-shrink: 0; vertical-align: -0.15em; }
+/* Directional icons (arrows, chevrons pointing "forward") mirror in RTL. */
+[dir="rtl"] .icon-dir { transform: scaleX(-1); }
+
+/* ── Interactive surfaces ── hover/focus in CSS so keyboard users get the
+   same feedback as mouse users (previously set from JS mouse events). */
+.task-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  cursor: pointer;
+  text-align: start;
+  width: 100%;
+  font: inherit;
+  color: var(--text-primary);
+  /* Buttons centre their content vertically by default; keep it top-aligned
+     when a card is stretched (grid rows, equal-height columns). */
+  display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch;
+  transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+}
+.task-card.is-overdue { border-color: color-mix(in srgb, var(--sig-red) 45%, transparent); }
+.task-card:hover, .task-card:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  border-block-start-color: var(--accent);
+}
+
+.nav-item, .footer-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 7px 10px; border-radius: 6px; border: none;
+  background: transparent; color: var(--text-secondary);
+  font-size: 13px; font-weight: 400; text-align: start; cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
+}
+.nav-item.is-indent { padding-block: 6px; padding-inline: 26px 10px; font-size: 12px; color: var(--text-muted); }
+.nav-item:hover, .footer-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+.nav-item.is-active, .nav-item.is-active:hover { background: var(--accent-soft); color: var(--accent-text); font-weight: 600; }
+
+/* Rows that pick something from a list (search results, mention lists). */
+.pick-row { cursor: pointer; }
+/* !important: these rows carry their resting background inline. */
+.pick-row:hover, .pick-row:focus-visible { background: var(--bg-hover) !important; }
+
+/* Visually hidden but available to screen readers. */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.project-tile:hover, .project-tile:focus-visible { border-color: var(--accent) !important; }
